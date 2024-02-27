@@ -1,11 +1,11 @@
 {
   "$schema": "https://mintlify.com/schema.json",
-  "name": "Starter Kit",
+  "name": "Bitnbox",
   "logo": {
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/favicon-32x32.png",
   "colors": {
     "primary": "#0D9373",
     "light": "#07C983",
@@ -15,15 +15,19 @@
       "to": "#07C983"
     }
   },
+  "openapi": ["/api-reference/openapi.json"],
+  "api": {
+    "baseUrl": "https://api.dev.bitnbox.io"
+  },
   "topbarLinks": [
     {
       "name": "Support",
-      "url": "mailto:hi@mintlify.com"
+      "url": "mailto:support@bitnbox.io"
     }
   ],
   "topbarCtaButton": {
     "name": "Dashboard",
-    "url": "https://dashboard.mintlify.com"
+    "url": "https://app.bitnbox.io"
   },
   "tabs": [
     {
@@ -32,60 +36,44 @@
     }
   ],
   "anchors": [
-    {
-      "name": "Documentation",
-      "icon": "book-open-cover",
-      "url": "https://mintlify.com/docs"
-    },
-    {
-      "name": "Community",
-      "icon": "slack",
-      "url": "https://mintlify.com/community"
-    },
-    {
-      "name": "Blog",
-      "icon": "newspaper",
-      "url": "https://mintlify.com/blog"
-    }
   ],
   "navigation": [
     {
       "group": "Get Started",
-      "pages": [
-        "introduction",
-        "quickstart",
-        "development"
-      ]
+      "pages": ["introduction", "quickstart", "development"]
     },
     {
       "group": "Essentials",
-      "pages": [
-        "essentials/markdown",
-        "essentials/code",
-        "essentials/images",
-        "essentials/settings",
-        "essentials/navigation",
-        "essentials/reusable-snippets"
-      ]
+      "pages": ["essentials/markdown", "essentials/code", "essentials/images", "essentials/settings", "essentials/navigation"]
     },
     {
       "group": "API Documentation",
+      "pages": ["api-reference/introduction"]
+    },
+    {
+      "group": "Payment",
       "pages": [
-        "api-reference/introduction"
+        "api-reference/endpoint/create-payment",
+        "api-reference/endpoint/status-payment"
       ]
     },
     {
-      "group": "Endpoint Examples",
+      "group": "Payout",
       "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete"
+        "api-reference/endpoint/create-payout",
+        "api-reference/endpoint/status-payout",
+        "api-reference/endpoint/payout-estimate-fee"
+      ]
+    },
+    {
+      "group": "Other",
+      "pages": [
+        "api-reference/endpoint/list-payout",
+        "api-reference/endpoint/balance",
+        "api-reference/endpoint/currencies"
       ]
     }
   ],
   "footerSocials": {
-    "twitter": "https://twitter.com/mintlify",
-    "github": "https://github.com/mintlify",
-    "linkedin": "https://www.linkedin.com/company/mintsearch"
   }
 }
