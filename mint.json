@@ -15,6 +15,10 @@
       "to": "#07C983"
     }
   },
+  "metadata": {
+    "og:image": "https://mintlify.s3-us-west-1.amazonaws.com/bitnbox/images/og.png",
+    "twitter:image": "https://mintlify.s3-us-west-1.amazonaws.com/bitnbox/images/og.png"
+  },
   "openapi": ["/api-reference/openapi.json"],
   "api": {
     "baseUrl": "https://api.dev.bitnbox.io"
