@@ -38,8 +38,9 @@
                       "exclusiveMinimum": false,
                       "description": "Amount in cryptocurrency"
                     },
-                    "id": {
-                      "type": "number",
+                    "paymentId": {
+                      "type": "string",
+                      "format": "uuid",
                       "description": "Unique payment identifier"
                     },
                     "status": {
@@ -77,7 +78,7 @@
                   },
                   "required": [
                     "amount",
-                    "id",
+                    "paymentId",
                     "status",
                     "payAmount",
                     "paidAmount",
@@ -95,7 +96,7 @@
     },
     "/v1/payment": {
       "post": {
-        "description": "Creates a payment. You need to provide the amount and the currency of the payment in the request.",
+        "description": "Creates a payment link. You need to provide the amount and the currency of the payment in the request.",
         "summary": "Create payment",
         "tags": [
           "v1"
@@ -109,22 +110,21 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "feeByUser": {
-                    "type": "boolean",
-                    "description": "Flag indicating if fee is paid by the user"
-                  },
                   "amount": {
                     "type": "number",
                     "minimum": 0,
                     "exclusiveMinimum": false,
                     "description": "Amount in cryptocurrency"
                   },
-                  "payCurrency": {
+                  "platformFeeByUser": {
+                    "type": "boolean"
+                  },
+                  "currency": {
                     "type": "string",
                     "minLength": 1,
                     "description": "Cryptocurrency type (btc, usdt, eth, etc)"
                   },
-                  "payNetwork": {
+                  "network": {
                     "type": "string",
                     "description": "Cryptocurrency network"
                   },
@@ -138,17 +138,27 @@
                     "minLength": 1,
                     "description": "Customer IP address (for security)"
                   },
+                  "orderId": {
+                    "type": "string",
+                    "description": "Order id"
+                  },
                   "additionalData": {
                     "type": "string",
                     "description": "Additional data"
+                  },
+                  "webhookUrl": {
+                    "type": "string",
+                    "description": "Webhook address"
                   }
                 },
                 "required": [
                   "amount",
-                  "payCurrency",
-                  "payNetwork",
+                  "platformFeeByUser",
+                  "currency",
+                  "network",
                   "customerId",
-                  "customerIp"
+                  "customerIp",
+                  "orderId"
                 ],
                 "description": "Payment creation request body"
               }
@@ -163,28 +173,29 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "feeByUser": {
-                      "type": "boolean",
-                      "description": "Flag indicating if fee is paid by the user"
-                    },
-                    "amount": {
-                      "type": "number",
-                      "minimum": 0,
-                      "exclusiveMinimum": false,
-                      "description": "Amount in cryptocurrency"
-                    },
-                    "payCurrency": {
+                    "paymentId": {
                       "type": "string",
-                      "minLength": 1,
-                      "description": "Cryptocurrency type (btc, usdt, eth, etc)"
+                      "format": "uuid",
+                      "description": "Unique payment identifier"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "waiting",
+                        "confirming",
+                        "failed",
+                        "locked",
+                        "rejected",
+                        "expired",
+                        "paid",
+                        "paid_over",
+                        "paid_partial"
+                      ],
+                      "description": "Payment status"
                     },
                     "payAmount": {
                       "type": "number",
                       "description": "Crypto AMOUNT+PERCENT"
-                    },
-                    "payNetwork": {
-                      "type": "string",
-                      "description": "Cryptocurrency network (e.g., erc20)"
                     },
                     "payAddress": {
                       "type": "string",
@@ -194,39 +205,74 @@
                       "type": "string",
                       "description": "URI for payment QR code"
                     },
-                    "fee": {
-                      "type": "number",
-                      "description": "Payment fee"
-                    },
-                    "id": {
-                      "type": "number",
-                      "description": "Unique payment identifier"
-                    },
-                    "status": {
+                    "currency": {
                       "type": "string",
-                      "description": "Payment status"
+                      "minLength": 1,
+                      "description": "Cryptocurrency type (btc, usdt, eth, etc)"
+                    },
+                    "network": {
+                      "type": "string",
+                      "description": "Cryptocurrency network (e.g., erc20)"
+                    },
+                    "customerId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "Customer ID (for security)"
+                    },
+                    "customerIp": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "Customer IP address (for security)"
+                    },
+                    "orderId": {
+                      "type": "string",
+                      "description": "Order id"
                     },
                     "additionalData": {
                       "type": "string",
                       "description": "Additional data"
                     },
+                    "platformFeeByUser": {
+                      "type": "boolean",
+                      "description": "Fee by user/merchant"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time",
                       "description": "Date of creation"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Date of update"
+                    },
+                    "expiredAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Date of expire"
+                    },
+                    "webhookUrl": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "Webhook url"
                     }
                   },
                   "required": [
-                    "amount",
-                    "payCurrency",
+                    "paymentId",
+                    "status",
                     "payAmount",
-                    "payNetwork",
                     "payAddress",
                     "payQrCodeUri",
-                    "fee",
-                    "id",
-                    "status",
-                    "createdAt"
+                    "currency",
+                    "network",
+                    "customerId",
+                    "customerIp",
+                    "orderId",
+                    "platformFeeByUser",
+                    "createdAt",
+                    "updatedAt",
+                    "expiredAt",
+                    "webhookUrl"
                   ],
                   "description": "Payment link creation successful"
                 }
@@ -277,25 +323,24 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "network": {
+                  "walletAddress": {
                     "type": "string",
-                    "description": "Blockchain network for withdrawal"
+                    "description": "User's wallet address"
                   },
-                  "currency": {
-                    "type": "string",
-                    "description": "Currency for withdrawal"
+                  "networkFeeByUser": {
+                    "type": "boolean"
                   },
                   "amount": {
                     "type": "number",
                     "description": "Amount to withdraw"
                   },
-                  "feeByUser": {
-                    "type": "boolean",
-                    "description": "Whether the withdrawal fee is borne by the user"
-                  },
-                  "walletAddress": {
+                  "currency": {
                     "type": "string",
-                    "description": "User's wallet address"
+                    "description": "Currency for withdrawal"
+                  },
+                  "network": {
+                    "type": "string",
+                    "description": "Blockchain network for withdrawal"
                   },
                   "customerId": {
                     "type": "string",
@@ -307,19 +352,29 @@
                     "minLength": 1,
                     "description": "Customer IP address (for security)"
                   },
+                  "orderId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Customer order ID"
+                  },
                   "additionalData": {
                     "type": "string",
                     "description": "Additional data for the withdrawal"
+                  },
+                  "webhookUrl": {
+                    "type": "string",
+                    "description": "Webhook address"
                   }
                 },
                 "required": [
-                  "network",
-                  "currency",
-                  "amount",
-                  "feeByUser",
                   "walletAddress",
+                  "networkFeeByUser",
+                  "amount",
+                  "currency",
+                  "network",
                   "customerId",
-                  "customerIp"
+                  "customerIp",
+                  "orderId"
                 ],
                 "description": "Withdrawal creation request body"
               }
@@ -334,18 +389,90 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "id": {
+                    "payoutId": {
                       "type": "string",
-                      "description": "Withdrawal ID"
+                      "format": "uuid",
+                      "description": "Payout ID"
                     },
                     "status": {
                       "type": "string",
-                      "description": "Withdrawal status"
+                      "enum": [
+                        "created",
+                        "review",
+                        "processing",
+                        "confirming",
+                        "checked",
+                        "paid",
+                        "failed",
+                        "cancelled"
+                      ],
+                      "description": "Payout status"
+                    },
+                    "amount": {
+                      "type": "number",
+                      "description": "The requested amount for payout"
+                    },
+                    "walletAddress": {
+                      "type": "string",
+                      "description": "The address to which payout was made"
+                    },
+                    "networkFeeByUser": {
+                      "type": "boolean",
+                      "description": "Who paid the blockchain fee, merchant or end user"
+                    },
+                    "currency": {
+                      "type": "string",
+                      "description": "The currency key: usdt, eth, usdc, etc"
+                    },
+                    "network": {
+                      "type": "string",
+                      "description": "The network key: eth, sepolia, tron, etc"
+                    },
+                    "customerId": {
+                      "type": "string",
+                      "description": "The end user ID, set by the merchant"
+                    },
+                    "customerIp": {
+                      "type": "string",
+                      "description": "The IP address of the end user, set by the merchant"
+                    },
+                    "orderId": {
+                      "type": "string",
+                      "description": "The order ID for the withdrawal, set by the merchant"
+                    },
+                    "additionalData": {
+                      "type": "string",
+                      "description": "Additional information, optional, set by the merchant"
+                    },
+                    "webhookUrl": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "The URL to which events for this withdrawal request will be sent"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Date of creation"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Date of update"
                     }
                   },
                   "required": [
-                    "id",
-                    "status"
+                    "payoutId",
+                    "status",
+                    "amount",
+                    "walletAddress",
+                    "networkFeeByUser",
+                    "currency",
+                    "network",
+                    "customerId",
+                    "customerIp",
+                    "orderId",
+                    "createdAt",
+                    "updatedAt"
                   ],
                   "description": "Successful withdrawal creation response"
                 }
